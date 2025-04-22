@@ -20,7 +20,6 @@ function App() {
       setMessages((m) => [...m, parsedMessage]);
     };
     if (ws) {
-      console.log("hellooooop--o1", ws);
       setSocket(ws);
       ws.onopen = () => {
         console.log("websocket connection opened");
@@ -30,7 +29,6 @@ function App() {
 
   const joinRoom = (roomId: string) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      console.log("opeeee");
       const joinMsg = {
         type: "join",
         payload: {
@@ -41,15 +39,15 @@ function App() {
     }
   };
   const handleSend = () => {
-    const data = {
+    const chatMsg = {
       type: "chat",
       payload: {
         message: message.toString(),
       },
       sentBy: "user",
     };
-    setMessages((m) => [...m, data]);
-    socket?.send(JSON.stringify(data));
+    setMessages((m) => [...m, chatMsg]);
+    socket?.send(JSON.stringify(chatMsg));
   };
 
   const handleChange = (e: any) => {
