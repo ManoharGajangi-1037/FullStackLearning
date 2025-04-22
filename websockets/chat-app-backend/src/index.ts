@@ -19,8 +19,16 @@ wss.on("connection", (socket) => {
     if (message_body.type == "chat") {
       const current_user: any = allSockets.find((x) => x.socket == socket);
       allSockets.forEach((x) => {
-        if (x.roomId == current_user.roomId) {
-          x.socket.send(message_body.payload.message);
+        if (x.roomId == current_user.roomId && x.socket != current_user.socket) {
+          x.socket.send(
+            JSON.stringify({
+              type: "chat",
+              payload: {
+                message: message_body.payload.message,
+              },
+              sentBy: "server",
+            })
+          );
         }
       });
     }

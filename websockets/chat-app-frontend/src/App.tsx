@@ -1,34 +1,35 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+type Message = {
+  type: string;
+  payload: {
+    message: string;
+  };
+  sentBy: string;
+};
+
 function App() {
   const [socket, setSocket] = useState<WebSocket>();
-  const [messages, setMessages] = useState(["hi there"]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8080");
     ws.onmessage = (event) => {
-      setMessages((m) => [...m, event.data]);
+      const parsedMessage: Message = JSON.parse(event.data);
+      setMessages((m) => [...m, parsedMessage]);
     };
     if (ws) {
       console.log("hellooooop--o1", ws);
       setSocket(ws);
       ws.onopen = () => {
-        console.log("websocket opened");
-        // const data = {
-        //   type: "join",
-        //   payload: {
-        //     roomId: "red",
-        //   },
-        // };
-        // ws?.send(JSON.stringify(data));
+        console.log("websocket connection opened");
       };
     }
   }, []);
 
   const joinRoom = (roomId: string) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-
       console.log("opeeee");
       const joinMsg = {
         type: "join",
@@ -45,7 +46,9 @@ function App() {
       payload: {
         message: message.toString(),
       },
+      sentBy: "user",
     };
+    setMessages((m) => [...m, data]);
     socket?.send(JSON.stringify(data));
   };
 
@@ -80,23 +83,38 @@ function App() {
           onClick={() => {
             joinRoom("yellow");
           }}
-          
         >
           Yellow
         </button>
       </div>
       <div className="h-[80vh] w-full  bg-white rounded-2xl flex flex-col">
         <div className="messages h-[70vh]">
-          {messages.map((m) => (
-            <>
-              <div className="MessageBox m-2 p-2 h-[50px] w-[500px] bg-blue-400 flex rounded-2xl">
-                {m}
-              </div>
-            </>
-          ))}
-          <div className="MessageBox m-2 p-2 h-[50px] w-[500px] bg-fuchsia-400 flex rounded-2xl">
-            Hii Iam Fine
-          </div>
+          {messages &&
+            messages.map((m: Message, index) => {
+              return (
+                <div
+                  className={`w-full flex justify-end 
+                 ${
+                   m.sentBy == "user"
+                     ? "flex justify-end"
+                     : "flex justify-start"
+                 } `}
+                >
+                  <div
+                    key={index}
+                    className={`MessageBox m-2 p-5 h-[20px]  flex items-center justify-center
+                        ${
+                          m.sentBy == "user"
+                            ? "bg-green-400 "
+                            : "bg-blue-400 justify-end"
+                        }
+                      rounded-xl`}
+                  >
+                    {m.payload.message}
+                  </div>
+                </div>
+              );
+            })}
         </div>
         <div className="flex h-[10vh] justify-end">
           <div>
