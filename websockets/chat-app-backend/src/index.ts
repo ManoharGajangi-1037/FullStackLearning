@@ -10,6 +10,7 @@ wss.on("connection", (socket) => {
   socket.on("message", (message) => {
     const message_body = JSON.parse(message.toString());
     if (message_body.type == "join") {
+      console.log("user logged");
       allSockets.push({
         socket: socket,
         roomId: message_body.payload.roomId,
