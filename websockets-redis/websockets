@@ -1,0 +1,4 @@
+npm init -y 
+npm i typescript 
+npx tsc --init  (later change root to ./src and outDir to ./dist)
+npm i ws ws@
